@@ -8,42 +8,62 @@ import {
 } from '@api';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { deleteCookie, getCookie, setCookie } from '../../../utils/cookie';
-import { authChecked } from '../userSlice';
+import { setAuthVerified } from '../userSlice';
 
-export const fetchUserRegister = createAsyncThunk(
-  'user/registr',
-  registerUserApi
+const removeAuthTokens = () => {
+  localStorage.removeItem('refreshToken');
+  deleteCookie('accessToken');
+};
+
+export const registerUserThunk = createAsyncThunk(
+  'user/register',
+  async (data: TRegisterData) => await registerUserApi(data)
 );
 
-export const fetchUserLogin = createAsyncThunk(
+export const loginUserThunk = createAsyncThunk(
   'user/login',
-  async ({ email, password }: Omit<TRegisterData, 'name'>) => {
-    const data = await loginUserApi({ email, password });
-    setCookie('accessToken', data.accessToken);
-    localStorage.setItem('refreshToken', data.refreshToken);
-    return data.user;
-  }
-);
-
-export const checkUserAuth = createAsyncThunk(
-  'user/checkUser',
-  (_, { dispatch }) => {
-    if (getCookie('accessToken')) {
-      dispatch(fetchGetApi()).finally(() => {
-        dispatch(authChecked());
-      });
-    } else {
-      dispatch(authChecked());
+  async (credentials: Omit<TRegisterData, 'name'>, { rejectWithValue }) => {
+    const { email, password } = credentials;
+    try {
+      const authData = await loginUserApi({ email, password });
+      setCookie('accessToken', authData.accessToken);
+      localStorage.setItem('refreshToken', authData.refreshToken);
+      return authData.user;
+    } catch (error: unknown) {
+      const errMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      return rejectWithValue(errMessage);
     }
   }
 );
 
-export const fetchGetApi = createAsyncThunk('user/getApi', getUserApi);
+export const authCheckThunk = createAsyncThunk(
+  'user/checkAuth',
+  async (_, thunkAPI) => {
+    const accessToken = getCookie('accessToken');
+    if (accessToken) {
+      try {
+        await thunkAPI.dispatch(getUserThunk());
+      } finally {
+        thunkAPI.dispatch(setAuthVerified());
+      }
+    } else {
+      thunkAPI.dispatch(setAuthVerified());
+    }
+  }
+);
 
-export const fetchUpdateApi = createAsyncThunk('user/updateApi', updateUserApi);
+export const getUserThunk = createAsyncThunk(
+  'user/fetch',
+  async () => await getUserApi()
+);
 
-export const fetchUserLogout = createAsyncThunk('user/logout', async () => {
+export const updateUserThunk = createAsyncThunk(
+  'user/update',
+  async (updates: Partial<TRegisterData>) => await updateUserApi(updates)
+);
+
+export const logoutUserThunk = createAsyncThunk('user/logout', async () => {
   await logoutApi();
-  localStorage.clear();
-  deleteCookie('accessToken');
+  removeAuthTokens();
 });

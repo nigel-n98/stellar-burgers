@@ -1,49 +1,44 @@
 import { createSlice, SerializedError } from '@reduxjs/toolkit';
 import { TOrder } from '@utils-types';
-import { SLICE_NAMES } from '../../utils/constants';
-import { fetchUserOrders } from './assync-thunk/userOrders';
+import { REDUX_SLICES } from '../../utils/constants';
+import { getUserOrdersThunk } from './assync-thunk/userOrders';
+import { userOrderExtraReducers } from './extra-reducers/userOrderExtraReducers';
 
-export interface IUserOrdersState {
-  orders: TOrder[];
-  loading: boolean;
-  error: SerializedError | null;
-}
+export type userOrdersSliceState = {
+  ordersData: TOrder[];
+  isLoading: boolean;
+  err: SerializedError | null;
+};
 
-export const initialState: IUserOrdersState = {
-  orders: [],
-  loading: false,
-  error: null
+export const userOrderInitial: userOrdersSliceState = {
+  ordersData: [],
+  isLoading: false,
+  err: null
 };
 
 export const userOrdersSlice = createSlice({
-  name: SLICE_NAMES.userOrders,
-  initialState,
+  name: REDUX_SLICES.userOrders,
+  initialState: userOrderInitial,
   reducers: {},
   extraReducers: (builder) => {
-    builder
-      .addCase(fetchUserOrders.pending, (state) => {
-        state.orders = [];
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchUserOrders.fulfilled, (state, action) => {
-        state.orders = action.payload;
-        state.loading = false;
-        state.error = null;
-      })
-      .addCase(fetchUserOrders.rejected, (state, action) => {
-        state.orders = [];
-        state.loading = false;
-        state.error = action.error;
-      });
+    builder.addCase(getUserOrdersThunk.pending, userOrderExtraReducers.pending);
+    builder.addCase(
+      getUserOrdersThunk.fulfilled,
+      userOrderExtraReducers.fulfilled
+    );
+    builder.addCase(
+      getUserOrdersThunk.rejected,
+      userOrderExtraReducers.rejected
+    );
   },
   selectors: {
-    getUserOrders: (state) => state.orders,
-    isUserOrdersLoading: (state) => state.loading,
-    getUserOrdersError: (state) => state.error
+    selectUserOrders: (state) => state.ordersData,
+    selectIsLoading: (state) => state.isLoading,
+    selectErr: (state) => state.err
   }
 });
 
-export const { getUserOrders, getUserOrdersError, isUserOrdersLoading } =
+export const { selectUserOrders, selectErr, selectIsLoading } =
   userOrdersSlice.selectors;
+
 export default userOrdersSlice;

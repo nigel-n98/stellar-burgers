@@ -1,51 +1,47 @@
 import { createSlice, PayloadAction, SerializedError } from '@reduxjs/toolkit';
 import { TIngredient } from '@utils-types';
-import { SLICE_NAMES } from '../../utils/constants';
-import { fetchIngredients } from './assync-thunk/ingredients';
+import { REDUX_SLICES } from '../../utils/constants';
+import { getIngredientsThunk } from './assync-thunk/ingredients';
+import { ingredientsExtraReducers } from './extra-reducers/ingredientsExtraReducers';
 
-interface IIngredientsState {
-  ingredients: TIngredient[];
-  loading: boolean;
-  error: SerializedError | null;
-}
+export type IngredientsSliceState = {
+  items: TIngredient[];
+  isLoading: boolean;
+  err: SerializedError | null;
+};
 
-export const initialState: IIngredientsState = {
-  ingredients: [],
-  loading: false,
-  error: null
+export const ingredientInitial: IngredientsSliceState = {
+  items: [],
+  isLoading: false,
+  err: null
 };
 
 export const ingredientsSlice = createSlice({
-  name: SLICE_NAMES.ingredients,
-  initialState,
+  name: REDUX_SLICES.ingredients,
+  initialState: ingredientInitial,
   reducers: {},
   extraReducers: (builder) => {
-    builder
-      .addCase(fetchIngredients.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(
-        fetchIngredients.fulfilled,
-        (state, action: PayloadAction<TIngredient[]>) => {
-          state.ingredients = action.payload;
-          state.loading = false;
-          state.error = null;
-        }
-      )
-      .addCase(fetchIngredients.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error;
-      });
+    builder.addCase(
+      getIngredientsThunk.pending,
+      ingredientsExtraReducers.pending
+    );
+    builder.addCase(
+      getIngredientsThunk.fulfilled,
+      ingredientsExtraReducers.fulfilled
+    );
+    builder.addCase(
+      getIngredientsThunk.rejected,
+      ingredientsExtraReducers.rejected
+    );
   },
   selectors: {
-    getIngredients: (state) => state.ingredients,
-    isIngredientsLoading: (state) => state.loading,
-    getIngredientError: (state) => state.error
+    selectIngredients: (state) => state.items,
+    selectIsLoading: (state) => state.isLoading,
+    selectErr: (state) => state.err
   }
 });
 
-export const { getIngredients, isIngredientsLoading, getIngredientError } =
+export const { selectIngredients, selectIsLoading, selectErr } =
   ingredientsSlice.selectors;
 
 export default ingredientsSlice;

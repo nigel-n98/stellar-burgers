@@ -4,22 +4,26 @@ import { FC, useEffect } from 'react';
 import { useDispatch, useSelector } from '../../services/store';
 import { Preloader } from '@ui';
 import {
-  getUserOrders,
-  isUserOrdersLoading
+  selectUserOrders,
+  selectIsLoading
 } from '../../services/slices/userOrderSlice';
-import { fetchUserOrders } from '../../services/slices/assync-thunk/userOrders';
+import { getUserOrdersThunk } from '../../services/slices/assync-thunk/userOrders';
 
 export const ProfileOrders: FC = () => {
   const dispatch = useDispatch();
 
-  const loading = useSelector(isUserOrdersLoading);
-  const orders: TOrder[] = useSelector(getUserOrders);
+  const isloading = useSelector(selectIsLoading);
+  const orders: TOrder[] = useSelector(selectUserOrders);
 
   useEffect(() => {
-    dispatch(fetchUserOrders());
+    dispatch(getUserOrdersThunk());
   }, []);
 
-  if (loading) return <Preloader />;
+  const content = isloading ? (
+    <Preloader />
+  ) : (
+    <ProfileOrdersUI orders={orders} />
+  );
 
-  return <ProfileOrdersUI orders={orders} />;
+  return content;
 };

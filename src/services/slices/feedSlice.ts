@@ -1,55 +1,41 @@
-import { createSlice, PayloadAction, SerializedError } from '@reduxjs/toolkit';
+import { createSlice, SerializedError } from '@reduxjs/toolkit';
 import { TOrder, TOrdersData } from '@utils-types';
-import { SLICE_NAMES } from '../../utils/constants';
-import { fetchFeed } from './assync-thunk/feed';
+import { REDUX_SLICES } from '../../utils/constants';
+import { getFeedThunk } from './assync-thunk/feed';
+import { feedExtraReducers } from './extra-reducers/feedExtraReducers';
 
-export interface IFeedState {
-  feed: TOrdersData | null;
-  orders: TOrder[];
-  error: SerializedError | null;
-  loading: boolean;
-}
+export type FeedSliceState = {
+  feedData: TOrdersData | null;
+  ordersList: TOrder[];
+  err: SerializedError | null;
+  isLoading: boolean;
+};
 
-export const initialState: IFeedState = {
-  feed: null,
-  orders: [],
-  error: null,
-  loading: false
+export const feedInitial: FeedSliceState = {
+  feedData: null,
+  ordersList: [],
+  err: null,
+  isLoading: false
 };
 
 const feedSlice = createSlice({
-  name: SLICE_NAMES.feed,
-  initialState,
+  name: REDUX_SLICES.feed,
+  initialState: feedInitial,
   reducers: {},
   extraReducers: (builder) => {
-    builder
-      .addCase(fetchFeed.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(
-        fetchFeed.fulfilled,
-        (state, action: PayloadAction<TOrdersData>) => {
-          state.feed = action.payload;
-          state.orders = action.payload.orders;
-          state.loading = false;
-          state.error = null;
-        }
-      )
-      .addCase(fetchFeed.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error;
-      });
+    builder.addCase(getFeedThunk.pending, feedExtraReducers.pending);
+    builder.addCase(getFeedThunk.fulfilled, feedExtraReducers.fulfilled);
+    builder.addCase(getFeedThunk.rejected, feedExtraReducers.rejected);
   },
   selectors: {
-    getFeed: (state) => state.feed,
-    getAllOrders: (state) => state.orders,
-    isFeedLoading: (state) => state.loading,
-    getFeedError: (state) => state.error
+    selectFeedData: (state: FeedSliceState) => state.feedData,
+    selectOrdersList: (state: FeedSliceState) => state.ordersList,
+    selectIsLoading: (state: FeedSliceState) => state.isLoading,
+    selectErr: (state: FeedSliceState) => state.err
   }
 });
 
 export default feedSlice;
 
-export const { getFeed, getAllOrders, isFeedLoading, getFeedError } =
+export const { selectFeedData, selectOrdersList, selectIsLoading, selectErr } =
   feedSlice.selectors;

@@ -9,14 +9,13 @@ import {
 } from '@zlden/react-developer-burger-ui-components';
 import { Link, NavLink } from 'react-router-dom';
 import clsx from 'clsx';
-import { PATHS } from '../../../utils/constants';
 
 export const AppHeaderUI: FC<TAppHeaderUIProps> = ({ userName }) => (
   <header className={styles.header}>
     <nav className={`${styles.menu} p-4`}>
       <div className={styles.menu_part_left}>
         <NavLink
-          to={PATHS.HOME}
+          to={'/'}
           className={({ isActive }) =>
             isActive ? styles.link_active : styles.link
           }
@@ -25,7 +24,7 @@ export const AppHeaderUI: FC<TAppHeaderUIProps> = ({ userName }) => (
           <p className='text text_type_main-default ml-2 mr-10'>Конструктор</p>
         </NavLink>
         <NavLink
-          to={PATHS.FEED}
+          to={'/feed'}
           className={({ isActive }) =>
             isActive ? styles.link_active : styles.link
           }
@@ -40,7 +39,7 @@ export const AppHeaderUI: FC<TAppHeaderUIProps> = ({ userName }) => (
         </div>
       </Link>
       <Link
-        to={`${userName ? PATHS.PROFILE : PATHS.LOGIN}`}
+        to={`${userName ? '/profile' : '/login'}`}
         className={clsx(
           styles.link,
           styles.link_active,

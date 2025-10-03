@@ -1,27 +1,29 @@
-import { Preloader } from '@ui';
-import { FeedUI } from '@ui-pages';
+import { ProfileOrdersUI } from '@ui-pages';
 import { TOrder } from '@utils-types';
 import { FC, useEffect } from 'react';
 import { useDispatch, useSelector } from '../../services/store';
-import { getAllOrders } from '../../services/slices/feedSlice';
-import { fetchFeed } from '../../services/slices/assync-thunk/feed';
+import { Preloader } from '@ui';
+import {
+  selectUserOrders,
+  selectIsLoading
+} from '../../services/slices/userOrderSlice';
+import { getUserOrdersThunk } from '../../services/slices/assync-thunk/userOrders';
 
 export const Feed: FC = () => {
   const dispatch = useDispatch();
-  const orders: TOrder[] = useSelector(getAllOrders);
+
+  const isLoading = useSelector(selectIsLoading);
+  const orders: TOrder[] = useSelector(selectUserOrders);
 
   useEffect(() => {
-    dispatch(fetchFeed());
-  }, []);
+    dispatch(getUserOrdersThunk());
+  }, [dispatch]);
 
-  const handleGetFeeds = () => {
-    location.assign('/feed');
-    dispatch(fetchFeed());
-  };
+  const content = isLoading ? (
+    <Preloader />
+  ) : (
+    <ProfileOrdersUI orders={orders} />
+  );
 
-  if (!orders.length) {
-    return <Preloader />;
-  }
-
-  return <FeedUI orders={orders} handleGetFeeds={handleGetFeeds} />;
+  return content;
 };

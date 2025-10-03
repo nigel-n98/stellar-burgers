@@ -1,14 +1,7 @@
-export const SLICE_NAMES = {
-  user: 'user',
-  ingredients: 'ingredients',
-  feed: 'feed',
-  burgerConstructor: 'burgerConstructor',
-  userOrders: 'userOrders'
+export const REDUX_SLICES = {
+  user: 'userSlice',
+  ingredients: 'ingredientsSlice',
+  feed: 'feedSlice',
+  burgerConstructor: 'constructorSlice',
+  userOrders: 'userOrdersSlice'
 };
-
-export const PATHS = {
-  HOME: '/',
-  FEED: '/feed',
-  PROFILE: '/profile',
-  LOGIN: '/login'
-} as const;

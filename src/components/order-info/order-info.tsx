@@ -4,24 +4,22 @@ import { OrderInfoUI } from '../ui/order-info';
 import { TIngredient, TOrder } from '@utils-types';
 import { useSelector } from '../../services/store';
 import { useParams } from 'react-router-dom';
-import { getAllOrders } from '../../services/slices/feedSlice';
-import { getIngredients } from '../../services/slices/ingredientsSlice';
-import { getAuthenticated } from '../../services/slices/userSlice';
-import { getUserOrders } from '../../services/slices/userOrderSlice';
+import { selectOrdersList } from '../../services/slices/feedSlice';
+import { selectIngredients } from '../../services/slices/ingredientsSlice';
+import { selectLoggedIn } from '../../services/slices/userSlice';
+import { selectUserOrders } from '../../services/slices/userOrderSlice';
 
 export const OrderInfo: FC = () => {
-  const params = useParams();
-  const ingredients: TIngredient[] = useSelector(getIngredients);
-  const isAuth = useSelector(getAuthenticated);
-  const orders = useSelector(getAllOrders);
-  const userOrders = useSelector(getUserOrders);
-  let allOrders: TOrder[];
+  const { number } = useParams<{ number: string }>();
+  const ingredients = useSelector(selectIngredients);
+  const isAuth = useSelector(selectLoggedIn);
+  const orders = useSelector(selectOrdersList);
+  const userOrders = useSelector(selectUserOrders);
 
-  !isAuth ? (allOrders = orders) : (allOrders = orders.concat(userOrders));
-
-  const orderData: TOrder | undefined = allOrders.find(
-    (i) => i.number === Number(params.number)
-  );
+  const orderData = useMemo(() => {
+    const combinedOrders = isAuth ? [...orders, ...userOrders] : orders;
+    return combinedOrders.find((order) => order.number === Number(number));
+  }, [orders, userOrders, isAuth, number]);
 
   const orderInfo = useMemo(() => {
     if (!orderData || !ingredients.length) return null;
