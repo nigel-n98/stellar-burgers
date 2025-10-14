@@ -12,7 +12,10 @@ describe('ingredientsSlice', () => {
   });
 
   test('pending должен устанавливать isLoading = true и err = null', () => {
-    const state = reducer(ingredientInitial, getIngredientsThunk.pending('', undefined));
+    const state = reducer(
+      ingredientInitial,
+      getIngredientsThunk.pending('', undefined)
+    );
     expect(state.isLoading).toBe(true);
     expect(state.err).toBeNull();
   });
@@ -34,7 +37,10 @@ describe('ingredientsSlice', () => {
       }
     ];
 
-    const state = reducer(ingredientInitial, getIngredientsThunk.fulfilled(payload, '', undefined));
+    const state = reducer(
+      ingredientInitial,
+      getIngredientsThunk.fulfilled(payload, '', undefined)
+    );
     expect(state.items).toEqual(payload);
     expect(state.isLoading).toBe(false);
     expect(state.err).toBeNull();
@@ -42,7 +48,10 @@ describe('ingredientsSlice', () => {
 
   test('rejected должен устанавливать ошибку и выключать isLoading', () => {
     const error = { message: 'Ошибка' } as any;
-    const state = reducer(ingredientInitial, getIngredientsThunk.rejected(error, '', undefined));
+    const state = reducer(
+      ingredientInitial,
+      getIngredientsThunk.rejected(error, '', undefined)
+    );
     expect(state.isLoading).toBe(false);
     expect(state.err).toEqual(error);
   });

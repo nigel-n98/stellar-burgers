@@ -14,7 +14,6 @@ import {
   updateUserApi
 } from '@api';
 import { deleteCookie, getCookie, setCookie } from '../../../utils/cookie';
-import { setAuthVerified } from '../userSlice';
 
 jest.mock('@api');
 jest.mock('../userSlice', () => ({
@@ -41,7 +40,11 @@ describe('user thunks', () => {
     const mockResult = { user: { email: 'a@a.com', name: 'A' } };
     (registerUserApi as jest.Mock).mockResolvedValue(mockResult);
 
-    const result = await registerUserThunk(mockData)(mockDispatch, () => {}, undefined);
+    const result = await registerUserThunk(mockData)(
+      mockDispatch,
+      () => {},
+      undefined
+    );
 
     expect(registerUserApi).toHaveBeenCalledWith(mockData);
     expect(result.payload).toEqual(mockResult);
@@ -56,32 +59,31 @@ describe('user thunks', () => {
     };
     (loginUserApi as jest.Mock).mockResolvedValue(mockAuthData);
 
-const result = await loginUserThunk(credentials)(
-  mockDispatch,
-  () => ({}),
-  undefined
-);
+    const result = await loginUserThunk(credentials)(
+      mockDispatch,
+      () => ({}),
+      undefined
+    );
 
-expect(loginUserApi).toHaveBeenCalledWith(credentials);
-expect(setCookie).toHaveBeenCalledWith('accessToken', 'access123');
-expect(localStorage.getItem('refreshToken')).toBe('refresh123');
-expect(result.payload).toEqual(mockAuthData.user);
+    expect(loginUserApi).toHaveBeenCalledWith(credentials);
+    expect(setCookie).toHaveBeenCalledWith('accessToken', 'access123');
+    expect(localStorage.getItem('refreshToken')).toBe('refresh123');
+    expect(result.payload).toEqual(mockAuthData.user);
   });
 
-it('loginUserThunk при ошибке вызывает rejectWithValue', async () => {
-  const error = new Error('Ошибка логина');
-  (loginUserApi as jest.Mock).mockRejectedValue(error);
+  it('loginUserThunk при ошибке вызывает rejectWithValue', async () => {
+    const error = new Error('Ошибка логина');
+    (loginUserApi as jest.Mock).mockRejectedValue(error);
 
-  const result = await loginUserThunk({ email: 'fail', password: 'x' })(
-    jest.fn(), 
-    () => ({}), 
-    undefined
-  );
+    const result = await loginUserThunk({ email: 'fail', password: 'x' })(
+      jest.fn(),
+      () => ({}),
+      undefined
+    );
 
-  expect(result.type).toBe('user/login/rejected');
-  expect(result.payload).toBe('Ошибка логина');
-});
-
+    expect(result.type).toBe('user/login/rejected');
+    expect(result.payload).toBe('Ошибка логина');
+  });
 
   it('authCheckThunk вызывает getUserThunk и setAuthVerified при наличии accessToken', async () => {
     (getCookie as jest.Mock).mockReturnValue('token123');
@@ -90,25 +92,21 @@ it('loginUserThunk при ошибке вызывает rejectWithValue', async 
       if (typeof action === 'function') await action(mockDispatch);
     });
 
-    await authCheckThunk()(
-  mockDispatch,
-  () => ({}),
-  undefined
-);
+    await authCheckThunk()(mockDispatch, () => ({}), undefined);
 
-    expect(mockDispatch).toHaveBeenCalledWith(expect.objectContaining({ type: 'user/setAuthVerified' }));
+    expect(mockDispatch).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'user/setAuthVerified' })
+    );
   });
 
   it('authCheckThunk вызывает только setAuthVerified, если нет accessToken', async () => {
     (getCookie as jest.Mock).mockReturnValue(undefined);
 
-    await authCheckThunk()(
-  mockDispatch,
-  () => ({}),
-  undefined
-);
+    await authCheckThunk()(mockDispatch, () => ({}), undefined);
 
-    expect(mockDispatch).toHaveBeenCalledWith(expect.objectContaining({ type: 'user/setAuthVerified' }));
+    expect(mockDispatch).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'user/setAuthVerified' })
+    );
   });
 
   it('getUserThunk вызывает getUserApi', async () => {
@@ -126,7 +124,11 @@ it('loginUserThunk при ошибке вызывает rejectWithValue', async 
     const mockResult = { user: { email: 'x@x.com', name: 'New' } };
     (updateUserApi as jest.Mock).mockResolvedValue(mockResult);
 
-    const result = await updateUserThunk(updates)(mockDispatch, () => {}, undefined);
+    const result = await updateUserThunk(updates)(
+      mockDispatch,
+      () => {},
+      undefined
+    );
 
     expect(updateUserApi).toHaveBeenCalledWith(updates);
     expect(result.payload).toEqual(mockResult);

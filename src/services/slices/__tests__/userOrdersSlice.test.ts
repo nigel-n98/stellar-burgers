@@ -31,7 +31,9 @@ describe('userOrdersSlice', () => {
       err: { name: 'e', message: 'm' } as any
     };
 
-    const next = reducer(prev as any, { type: getUserOrdersThunk.pending.type });
+    const next = reducer(prev as any, {
+      type: getUserOrdersThunk.pending.type
+    });
     expect(next.ordersData).toEqual([]);
     expect(next.isLoading).toBe(true);
     expect(next.err).toBeNull();

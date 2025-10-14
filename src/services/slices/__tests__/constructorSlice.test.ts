@@ -155,41 +155,41 @@ describe('constructorSlice', () => {
       expect(nextState.err).toEqual(error);
     });
 
-it('fulfilled должен очищать конструктор и записывать orderPopupData', () => {
-  const prevState: BurgerSliceState = {
-    ...defaultState,
-    builderItems: {
-      bun: { ...bun, id: 'bun123' },
-      fillings: [{ ...filling, id: 'fill1' }]
-    },
-    isOrdering: true,
-    err: null,
-    orderPopupData: null
-  };
+    it('fulfilled должен очищать конструктор и записывать orderPopupData', () => {
+      const prevState: BurgerSliceState = {
+        ...defaultState,
+        builderItems: {
+          bun: { ...bun, id: 'bun123' },
+          fillings: [{ ...filling, id: 'fill1' }]
+        },
+        isOrdering: true,
+        err: null,
+        orderPopupData: null
+      };
 
-  const payload = {
-    success: true,
-    name: 'createOrder',
-    order: {
-      _id: 'order123',
-      status: 'done',
-      name: 'Super Burger',
-      createdAt: '2025-10-12T00:00:00.000Z',
-      updatedAt: '2025-10-12T00:00:00.000Z',
-      number: 777,
-      ingredients: ['1', '2']
-    } as TOrder
-  };
+      const payload = {
+        success: true,
+        name: 'createOrder',
+        order: {
+          _id: 'order123',
+          status: 'done',
+          name: 'Super Burger',
+          createdAt: '2025-10-12T00:00:00.000Z',
+          updatedAt: '2025-10-12T00:00:00.000Z',
+          number: 777,
+          ingredients: ['1', '2']
+        } as TOrder
+      };
 
-  const nextState = reducer(
-    prevState,
-    orderBurgerThunk.fulfilled(payload, '', [])
-  );
+      const nextState = reducer(
+        prevState,
+        orderBurgerThunk.fulfilled(payload, '', [])
+      );
 
-  expect(nextState.isOrdering).toBe(false);
-  expect(nextState.builderItems.bun).toBeNull();
-  expect(nextState.builderItems.fillings.length).toBe(0);
-  expect(nextState.orderPopupData).toEqual(payload.order);
+      expect(nextState.isOrdering).toBe(false);
+      expect(nextState.builderItems.bun).toBeNull();
+      expect(nextState.builderItems.fillings.length).toBe(0);
+      expect(nextState.orderPopupData).toEqual(payload.order);
     });
   });
 });

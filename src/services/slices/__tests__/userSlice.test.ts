@@ -97,7 +97,11 @@ describe('userSlice — редьюсер и экстра-редьюсеры', ()
   });
 
   it('logoutUserThunk.fulfilled сбрасывает currentUser и loggedIn', () => {
-    const state = { ...userInitial, currentUser: { email: 'x@x', name: 'X' }, loggedIn: true };
+    const state = {
+      ...userInitial,
+      currentUser: { email: 'x@x', name: 'X' },
+      loggedIn: true
+    };
     const next = reducer(state, { type: logoutUserThunk.fulfilled.type });
     expect(next.currentUser).toBeNull();
     expect(next.loggedIn).toBe(false);
@@ -107,14 +111,17 @@ describe('userSlice — редьюсер и экстра-редьюсеры', ()
   });
 
   it('logoutUserThunk.rejected записывает ошибку и не разлогинивает (сохраняет loggedIn=true)', () => {
-    const state = { ...userInitial, currentUser: { email: 'x@x', name: 'X' }, loggedIn: true };
+    const state = {
+      ...userInitial,
+      currentUser: { email: 'x@x', name: 'X' },
+      loggedIn: true
+    };
     const error = { message: 'logout failed' } as any;
     const next = reducer(state, { type: logoutUserThunk.rejected.type, error });
     expect(next.err).toEqual(error);
     expect(next.loggedIn).toBe(true);
     expect(next.isLoading).toBe(false);
   });
-
 
   it('getUserThunk.pending устанавливает isLoading = true', () => {
     const next = reducer(userInitial, { type: getUserThunk.pending.type });
@@ -124,7 +131,10 @@ describe('userSlice — редьюсер и экстра-редьюсеры', ()
 
   it('getUserThunk.fulfilled записывает payload.user в currentUser и loggedIn = true', () => {
     const payload = { user: { email: 'g@g.com', name: 'G' } as TUser };
-    const next = reducer(userInitial, { type: getUserThunk.fulfilled.type, payload });
+    const next = reducer(userInitial, {
+      type: getUserThunk.fulfilled.type,
+      payload
+    });
     expect(next.currentUser).toEqual(payload.user);
     expect(next.loggedIn).toBe(true);
     expect(next.authVerificationDone).toBe(true);
@@ -134,7 +144,10 @@ describe('userSlice — редьюсер и экстра-редьюсеры', ()
 
   it('getUserThunk.rejected записывает ошибку и authVerificationDone = true', () => {
     const error = { message: 'get user failed' } as any;
-    const next = reducer(userInitial, { type: getUserThunk.rejected.type, error });
+    const next = reducer(userInitial, {
+      type: getUserThunk.rejected.type,
+      error
+    });
     expect(next.err).toEqual(error);
     expect(next.authVerificationDone).toBe(true);
     expect(next.loggedIn).toBe(false);
@@ -142,23 +155,38 @@ describe('userSlice — редьюсер и экстра-редьюсеры', ()
   });
 
   it('updateUserThunk.pending ставит isLoading = true', () => {
-    const state = { ...userInitial, currentUser: { email: 'old@o', name: 'Old' }, loggedIn: true };
+    const state = {
+      ...userInitial,
+      currentUser: { email: 'old@o', name: 'Old' },
+      loggedIn: true
+    };
     const next = reducer(state, { type: updateUserThunk.pending.type });
     expect(next.isLoading).toBe(true);
     expect(next.err).toBeNull();
   });
 
   it('updateUserThunk.fulfilled обновляет currentUser через payload.user', () => {
-    const state = { ...userInitial, currentUser: { email: 'old@o', name: 'Old' }, loggedIn: true };
+    const state = {
+      ...userInitial,
+      currentUser: { email: 'old@o', name: 'Old' },
+      loggedIn: true
+    };
     const payload = { user: { email: 'new@n', name: 'New' } as TUser };
-    const next = reducer(state, { type: updateUserThunk.fulfilled.type, payload });
+    const next = reducer(state, {
+      type: updateUserThunk.fulfilled.type,
+      payload
+    });
     expect(next.currentUser).toEqual(payload.user);
     expect(next.isLoading).toBe(false);
     expect(next.err).toBeNull();
   });
 
   it('updateUserThunk.rejected записывает ошибку и оставляет loggedIn = true', () => {
-    const state = { ...userInitial, currentUser: { email: 'old@o', name: 'Old' }, loggedIn: true };
+    const state = {
+      ...userInitial,
+      currentUser: { email: 'old@o', name: 'Old' },
+      loggedIn: true
+    };
     const error = { message: 'update failed' } as any;
     const next = reducer(state, { type: updateUserThunk.rejected.type, error });
     expect(next.err).toEqual(error);
@@ -167,13 +195,20 @@ describe('userSlice — редьюсер и экстра-редьюсеры', ()
   });
 
   it('селекторы selectCurrentUser/selectAuthVerified/selectLoggedIn/selectErr/selectIsLoading работают с root-state', () => {
-   const sliceState = { ...userInitial, currentUser: { email: 's@u', name: 'S' } as TUser, authVerificationDone: true, loggedIn: true };
-const rootState: any = { [userSlice.name]: sliceState };
+    const sliceState = {
+      ...userInitial,
+      currentUser: { email: 's@u', name: 'S' } as TUser,
+      authVerificationDone: true,
+      loggedIn: true
+    };
+    const rootState: any = { [userSlice.name]: sliceState };
 
-expect(selectCurrentUser(rootState)).toEqual(sliceState.currentUser);
-expect(selectAuthVerified(rootState)).toEqual(sliceState.authVerificationDone);
-expect(selectLoggedIn(rootState)).toEqual(sliceState.loggedIn);
-expect(selectErr(rootState)).toEqual(sliceState.err);
-expect(selectIsLoading(rootState)).toEqual(sliceState.isLoading);
+    expect(selectCurrentUser(rootState)).toEqual(sliceState.currentUser);
+    expect(selectAuthVerified(rootState)).toEqual(
+      sliceState.authVerificationDone
+    );
+    expect(selectLoggedIn(rootState)).toEqual(sliceState.loggedIn);
+    expect(selectErr(rootState)).toEqual(sliceState.err);
+    expect(selectIsLoading(rootState)).toEqual(sliceState.isLoading);
   });
 });
