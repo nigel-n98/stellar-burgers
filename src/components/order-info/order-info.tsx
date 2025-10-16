@@ -1,13 +1,14 @@
-import { FC, useMemo } from 'react';
+import { FC, useEffect, useMemo } from 'react';
 import { Preloader } from '../ui/preloader';
 import { OrderInfoUI } from '../ui/order-info';
-import { TIngredient, TOrder } from '@utils-types';
-import { useSelector } from '../../services/store';
+import { TIngredient } from '@utils-types';
+import { useSelector, useDispatch } from '../../services/store';
 import { useParams } from 'react-router-dom';
 import { selectOrdersList } from '../../services/slices/feedSlice';
 import { selectIngredients } from '../../services/slices/ingredientsSlice';
 import { selectLoggedIn } from '../../services/slices/userSlice';
 import { selectUserOrders } from '../../services/slices/userOrderSlice';
+import { getOrderByNumberThunk } from '../../services/slices/assync-thunk/orderByNumber';
 
 export const OrderInfo: FC = () => {
   const { number } = useParams<{ number: string }>();
@@ -15,11 +16,18 @@ export const OrderInfo: FC = () => {
   const isAuth = useSelector(selectLoggedIn);
   const orders = useSelector(selectOrdersList);
   const userOrders = useSelector(selectUserOrders);
+  const dispatch = useDispatch();
 
   const orderData = useMemo(() => {
     const combinedOrders = isAuth ? [...orders, ...userOrders] : orders;
     return combinedOrders.find((order) => order.number === Number(number));
   }, [orders, userOrders, isAuth, number]);
+
+  useEffect(() => {
+    if (!orderData && number) {
+      dispatch(getOrderByNumberThunk(Number(number)));
+    }
+  }, [orderData, number, dispatch]);
 
   const orderInfo = useMemo(() => {
     if (!orderData || !ingredients.length) return null;
@@ -35,15 +43,11 @@ export const OrderInfo: FC = () => {
         if (!acc[item]) {
           const ingredient = ingredients.find((ing) => ing._id === item);
           if (ingredient) {
-            acc[item] = {
-              ...ingredient,
-              count: 1
-            };
+            acc[item] = { ...ingredient, count: 1 };
           }
         } else {
           acc[item].count++;
         }
-
         return acc;
       },
       {}
@@ -54,17 +58,10 @@ export const OrderInfo: FC = () => {
       0
     );
 
-    return {
-      ...orderData,
-      ingredientsInfo,
-      date,
-      total
-    };
+    return { ...orderData, ingredientsInfo, date, total };
   }, [orderData, ingredients]);
 
-  if (!orderInfo) {
-    return <Preloader />;
-  }
+  if (!orderInfo) return <Preloader />;
 
   return <OrderInfoUI orderInfo={orderInfo} />;
 };

@@ -1,29 +1,35 @@
-import { ProfileOrdersUI } from '@ui-pages';
 import { TOrder } from '@utils-types';
 import { FC, useEffect } from 'react';
 import { useDispatch, useSelector } from '../../services/store';
 import { Preloader } from '@ui';
 import {
-  selectUserOrders,
+  selectOrdersList,
   selectIsLoading
-} from '../../services/slices/userOrderSlice';
-import { getUserOrdersThunk } from '../../services/slices/assync-thunk/userOrders';
+} from '../../services/slices/feedSlice';
+import { getFeedThunk } from '../../services/slices/assync-thunk/feed';
+import { FeedUI } from '../../components/ui/pages/feed';
 
 export const Feed: FC = () => {
   const dispatch = useDispatch();
 
   const isLoading = useSelector(selectIsLoading);
-  const orders: TOrder[] = useSelector(selectUserOrders);
+  const orders: TOrder[] = useSelector(selectOrdersList);
 
   useEffect(() => {
-    dispatch(getUserOrdersThunk());
+    dispatch(getFeedThunk());
   }, [dispatch]);
 
-  const content = isLoading ? (
-    <Preloader />
-  ) : (
-    <ProfileOrdersUI orders={orders} />
-  );
+  const handleGetFeeds = () => {
+    dispatch(getFeedThunk());
+  };
 
-  return content;
+  if (isLoading) {
+    return <Preloader />;
+  }
+
+  if (!orders || orders.length === 0) {
+    return <div>Нет заказов для отображения</div>;
+  }
+
+  return <FeedUI orders={orders} handleGetFeeds={handleGetFeeds} />;
 };

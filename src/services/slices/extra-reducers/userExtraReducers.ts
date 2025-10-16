@@ -1,4 +1,15 @@
 import { userSliceState } from '../userSlice';
+import { TUser } from '@utils-types';
+import { SerializedError } from '@reduxjs/toolkit';
+
+// Всего два основных типа для действий
+type TUserFulfilledAction = {
+  payload: TUser | { user: TUser };
+};
+
+type TRejectedAction = {
+  error: SerializedError;
+};
 
 export const userExtraReducers = {
   login: {
@@ -9,14 +20,15 @@ export const userExtraReducers = {
       state.isLoading = true;
       state.err = null;
     },
-    fulfilled: (state: userSliceState, action: any) => {
-      state.currentUser = action.payload;
+    fulfilled: (state: userSliceState, action: TUserFulfilledAction) => {
+      state.currentUser =
+        'user' in action.payload ? action.payload.user : action.payload;
       state.authVerificationDone = true;
       state.loggedIn = true;
       state.isLoading = false;
       state.err = null;
     },
-    rejected: (state: userSliceState, action: any) => {
+    rejected: (state: userSliceState, action: TRejectedAction) => {
       state.currentUser = null;
       state.authVerificationDone = true;
       state.loggedIn = false;
@@ -32,14 +44,15 @@ export const userExtraReducers = {
       state.isLoading = true;
       state.err = null;
     },
-    fulfilled: (state: userSliceState, action: any) => {
-      state.currentUser = action.payload.user;
+    fulfilled: (state: userSliceState, action: TUserFulfilledAction) => {
+      state.currentUser =
+        'user' in action.payload ? action.payload.user : action.payload;
       state.authVerificationDone = true;
       state.loggedIn = true;
       state.isLoading = false;
       state.err = null;
     },
-    rejected: (state: userSliceState, action: any) => {
+    rejected: (state: userSliceState, action: TRejectedAction) => {
       state.currentUser = null;
       state.authVerificationDone = true;
       state.loggedIn = false;
@@ -49,9 +62,6 @@ export const userExtraReducers = {
   },
   logout: {
     pending: (state: userSliceState) => {
-      state.currentUser = state.currentUser;
-      state.authVerificationDone = state.authVerificationDone;
-      state.loggedIn = true;
       state.isLoading = true;
       state.err = null;
     },
@@ -62,10 +72,7 @@ export const userExtraReducers = {
       state.isLoading = false;
       state.err = null;
     },
-    rejected: (state: userSliceState, action: any) => {
-      state.currentUser = state.currentUser;
-      state.authVerificationDone = true;
-      state.loggedIn = true;
+    rejected: (state: userSliceState, action: TRejectedAction) => {
       state.isLoading = false;
       state.err = action.error;
     }
@@ -78,14 +85,15 @@ export const userExtraReducers = {
       state.isLoading = true;
       state.err = null;
     },
-    fulfilled: (state: userSliceState, action: any) => {
-      state.currentUser = action.payload.user;
+    fulfilled: (state: userSliceState, action: TUserFulfilledAction) => {
+      state.currentUser =
+        'user' in action.payload ? action.payload.user : action.payload;
       state.authVerificationDone = true;
       state.loggedIn = true;
       state.isLoading = false;
       state.err = null;
     },
-    rejected: (state: userSliceState, action: any) => {
+    rejected: (state: userSliceState, action: TRejectedAction) => {
       state.currentUser = null;
       state.authVerificationDone = true;
       state.loggedIn = false;
@@ -95,23 +103,16 @@ export const userExtraReducers = {
   },
   updateUser: {
     pending: (state: userSliceState) => {
-      state.currentUser = state.currentUser;
-      state.authVerificationDone = state.authVerificationDone;
-      state.loggedIn = state.loggedIn;
       state.isLoading = true;
       state.err = null;
     },
-    fulfilled: (state: userSliceState, action: any) => {
-      state.currentUser = action.payload.user;
-      state.authVerificationDone = state.authVerificationDone;
-      state.loggedIn = state.loggedIn;
+    fulfilled: (state: userSliceState, action: TUserFulfilledAction) => {
+      state.currentUser =
+        'user' in action.payload ? action.payload.user : action.payload;
       state.isLoading = false;
       state.err = null;
     },
-    rejected: (state: userSliceState, action: any) => {
-      state.currentUser = state.currentUser;
-      state.authVerificationDone = state.authVerificationDone;
-      state.loggedIn = true;
+    rejected: (state: userSliceState, action: TRejectedAction) => {
       state.isLoading = false;
       state.err = action.error;
     }

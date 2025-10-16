@@ -3,6 +3,8 @@ import { TOrder } from '@utils-types';
 import { REDUX_SLICES } from '../../utils/constants';
 import { getUserOrdersThunk } from './assync-thunk/userOrders';
 import { userOrderExtraReducers } from './extra-reducers/userOrderExtraReducers';
+import { getOrderByNumberThunk } from './assync-thunk/orderByNumber';
+import { orderHandlers } from './extra-reducers/userOrderExtraReducers';
 
 export type userOrdersSliceState = {
   ordersData: TOrder[];
@@ -30,6 +32,9 @@ export const userOrdersSlice = createSlice({
       getUserOrdersThunk.rejected,
       userOrderExtraReducers.rejected
     );
+    builder.addCase(getOrderByNumberThunk.pending, orderHandlers.pending);
+    builder.addCase(getOrderByNumberThunk.fulfilled, orderHandlers.fulfilled);
+    builder.addCase(getOrderByNumberThunk.rejected, orderHandlers.rejected);
   },
   selectors: {
     selectUserOrders: (state) => state.ordersData,
