@@ -1,0 +1,38 @@
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "643d69a5c3f7b9001cfa093d",
+      "name": "Булка N-200i",
+      "type": "bun",
+      "proteins": 80,
+      "fat": 24,
+      "carbohydrates": 53,
+      "calories": 420,
+      "price": 125,
+      "image": "https://code.s3.yandex.net/react/code/bun-02.png"
+    },
+    {
+      "_id": "643d69a5c3f7b9001cfa0941",
+      "name": "Соус фирменный Space Sauce",
+      "type": "sauce",
+      "proteins": 50,
+      "fat": 22,
+      "carbohydrates": 11,
+      "calories": 80,
+      "price": 90,
+      "image": "https://code.s3.yandex.net/react/code/sauce-04.png"
+    },
+    {
+      "_id": "643d69a5c3f7b9001cfa0945",
+      "name": "Мясо бессмертных моллюсков Protostomia",
+      "type": "main",
+      "proteins": 433,
+      "fat": 244,
+      "carbohydrates": 33,
+      "calories": 420,
+      "price": 300,
+      "image": "https://code.s3.yandex.net/react/code/meat-02.png"
+    }
+  ]
+}
